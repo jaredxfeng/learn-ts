@@ -27,7 +27,7 @@ calcs.push(squareNumber)
 
 // -------------------------
 
-// function signatures on interfaces
+// function signatures in interfaces
 
 interface HasArea {
     name: string;
