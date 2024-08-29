@@ -1,33 +1,24 @@
 // how to import a JS module in a TS file?
 // 1. run `npm init -Y`
 // 2. run `npm install -D @types/node`
-import { appendFileSync, write } from 'fs';
+import { appendFileSync } from 'fs';
 
-interface Payment {
-    id: number;
-    amount: number;
-    to: string;
-    notes: string;
-}
-
-// type is a list of union types
-type PaymentColumns = ('id' | 'amount' | 'to' | 'notes')[];
-
-class csvWriter {
+export class csvWriter<T> {
     private csv: string = '';
 
-    constructor(private columns: PaymentColumns) {
+    // keyof T means the keys of a custom type/interface T
+    constructor(private columns: (keyof T)[]) {
         this.csv += this.columns.join(',') + '\n';
     }
     
-    addRows(payments: Payment[]): void {
-        let rows = payments.map((payment) => this.formatRow(payment));
-        this.csv += rows.join('\n');
+    addRows(rows: T[]): void {
+        let rowsStr: string[] = rows.map((row) => this.formatRow(row));
+        this.csv += rowsStr.join('\n');
         console.log(this.csv);
     }
 
-    private formatRow(payment: Payment): string {
-        return this.columns.map((col) => payment[col]).join(',');
+    private formatRow(row: T): string {
+        return this.columns.map((col) => row[col]).join(',');
     }
 
     save(filename: string): void {
@@ -37,9 +28,3 @@ class csvWriter {
     }
 }
 
-const writer = new csvWriter(['id', 'amount', 'to', 'notes']);
-writer.addRows([
-    {id: 1, amount: 50, to: 'yoshi', notes: 'design work'},
-    {id: 55, amount: 100, to: 'mario', notes: 'plumbing'},
-])
-writer.save('./data/payments.csv');
